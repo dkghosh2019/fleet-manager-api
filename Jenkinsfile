@@ -5,20 +5,24 @@ pipeline {
         // Defining variables for reusability
         DOCKER_IMAGE = "fleet-manager:v1"
         CHART_PATH   = "./fleet-manager-chart"
+        // Use the full URL directly to avoid the "empty string" error
+        REPO_URL = "https://github.com/dkghosh2019/fleet-manager-api.git"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Pull the latest code from GitHub
-                checkout scm
+               // Simplified git checkout
+                git branch: 'main', url: "${REPO_URL}"
             }
         }
 
         stage('Unit Tests') {
             steps {
                 // Run Maven tests using the 'local' profile we created
-                sh './mvnw clean test -Dspring.profiles.active=local'
+               // sh './mvnw clean test -Dspring.profiles.active=local'
+                sh 'chmod +x mvnw' // Ensures script can run
+                 sh './mvnw clean test -Dspring.profiles.active=local'
             }
         }
 
