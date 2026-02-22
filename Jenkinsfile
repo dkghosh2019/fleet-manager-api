@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     options {
-        // This stops Jenkins from trying its own broken checkout
         skipDefaultCheckout()
     }
 
@@ -11,24 +10,19 @@ pipeline {
         CHART_PATH   = "./fleet-manager-chart"
         REPO_URL     = "https://github.com/dkghosh2019/fleet-manager-api.git"
     }
-        stage('Unit Tests') {
+
+    stages { // <--- This was missing
+        stage('Checkout') {
             steps {
-                sh 'chmod +x mvnw'
-                // Pass H2 settings directly to Maven to bypass file issues
-                sh """
-                ./mvnw clean test \
-                -Dspring.profiles.active=test \
-                -Dspring.datasource.url=jdbc:h2:mem:testdb \
-                -Dspring.datasource.driverClassName=org.h2.Driver \
-                -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-                """
+                git branch: 'main', url: "${REPO_URL}"
             }
         }
 
         stage('Unit Tests') {
             steps {
                 sh 'chmod +x mvnw'
-                sh './mvnw clean test -Dspring.profiles.active=test'
+                // Forcing H2 on one line to avoid Groovy string issues
+                sh './mvnw clean test -Dspring.profiles.active=test -Dspring.datasource.url=jdbc:h2:mem:testdb -Dspring.datasource.driverClassName=org.h2.Driver -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect'
             }
         }
 
@@ -49,7 +43,7 @@ pipeline {
                 sh "helm upgrade --install my-fleet ${CHART_PATH}"
             }
         }
-    }
+    } // <--- End of stages
 
     post {
         success { echo '✅ Deployment successful!' }
