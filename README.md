@@ -38,5 +38,23 @@ Access health and metrics via Spring Actuator:
 http://localhost:30080/actuator/health
 http://localhost:30080/api/vehicles
 ```
+
+## 🚦 API Usage & Troubleshooting
+
+### Local Access (Docker/Dev)
+Once running, you can interact with the Fleet Manager API at:
+- **List All Vehicles:** `GET http://localhost:8080/api/vehicles`
+- **Vehicle by ID:** `GET http://localhost:8080/api/vehicles/V1`
+
+### Kubernetes Access
+The service is exposed via NodePort `30080`:
+- **API Entry:** `http://localhost:30080/api/vehicles`
+- **Actuator Health:** `http://localhost:30080/actuator/health`
+
+### 🔧 Troubleshooting Tips
+- **Port Mapping:** If the container starts but you cannot reach the API, verify your port mapping: `docker run -p 8080:8080 fleet-manager:v1`.
+- **Endpoint Discovery:** To see a full list of registered URL paths and Actuator mappings, visit: `http://localhost:8080/actuator/mappings`.
+- **Image Architecture:** Ensure your local Java version (21) matches the [Eclipse Temurin](https://hub.docker.com) base image in the Dockerfile.
+
 ---
 
