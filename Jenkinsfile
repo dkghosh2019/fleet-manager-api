@@ -38,11 +38,14 @@ pipeline {
             }
         }
 
+
         stage('Kubernetes Deploy') {
             steps {
-                sh "helm upgrade --install my-fleet ${CHART_PATH}"
+                // Use the insecure flag to ignore the certificate name mismatch on local Docker Desktop
+                sh "helm upgrade --install my-fleet ${CHART_PATH} --kube-insecure-skip-tls-verify"
             }
         }
+
     } // <--- End of stages
 
     post {
