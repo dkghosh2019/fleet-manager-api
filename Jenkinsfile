@@ -23,7 +23,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh 'chmod +x mvnw'
-                sh './mvnw clean test -Dspring.profiles.active=local'
+                sh './mvnw clean test -Dspring.profiles.active=test'
             }
         }
 
