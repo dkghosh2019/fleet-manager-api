@@ -58,3 +58,62 @@ The service is exposed via NodePort `30080`:
 
 ---
 
+## 🧪 Testing & Database Persistence
+
+### Local Database (Docker Sidecar)
+To support local development without a system-wide PostgreSQL installation, run the database as a container:
+```bash
+docker run --name fleet-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=fleetdb -p 5432:5432 -d postgres:15
+```
+
+## Running the Application
+he application uses Spring Profiles to switch between local Docker and Kubernetes internal networking.
+Local Development:
+``` 
+./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"
+Unit Testing:
+./mvnw clean test (Mocks the repository layer via MockitoBean for isolated CI/CD execution).
+```
+
+### 🚦 API Documentation (Happy & Sad Paths)
+
+
+| Scenario | Method | Endpoint | Expected Result |
+| :--- | :--- | :--- | :--- |
+| **List All** | `GET` | `/api/vehicles` | `200 OK` - Array of 3 seeded vehicles |
+| **Search Found** | `GET` | `/api/vehicles/V1` | `200 OK` - Tesla Model 3 Details |
+| **Search Missing** | `GET` | `/api/vehicles/999` | `404 Not Found` - Standardized Error JSON |
+
+
+---
+
+## Error Handling
+The project implements a Global Exception Handler using @ControllerAdvice. All errors return a consistent structure:
+```json
+{
+  "timestamp": "2026-02-22T03:30:00",
+  "message": "Vehicle not found with ID: 999",
+  "details": "uri=/api/vehicles/999"
+}
+
+```
+### 🚀 Final Sync to Main
+Now that your documentation is as polished as your code, perform the final merge:
+
+1. **Commit to Feature:**
+   ```bash
+   git add README.md
+   git commit -m "docs: update README with database sidecar and testing instructions"
+   git push origin feature/add-postgres-persistence
+```
+Merge to Main:
+```bash
+git checkout main
+git merge feature/add-postgres-persistence
+git push origin main
+```
+## 🎡 Jenkins Check
+Now that your main branch is perfect, are you ready to run the Jenkins Docker command to start the automation phase?
+```powershell 
+docker run -d -p 8081:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock --name jenkins-server jenkins/jenkins:lts
+```
