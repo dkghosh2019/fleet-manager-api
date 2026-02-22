@@ -11,12 +11,17 @@ pipeline {
         CHART_PATH   = "./fleet-manager-chart"
         REPO_URL     = "https://github.com/dkghosh2019/fleet-manager-api.git"
     }
-
-    stages {
-        stage('Checkout') {
+        stage('Unit Tests') {
             steps {
-                // Now this is the ONLY place checkout happens
-                git branch: 'main', url: "${REPO_URL}"
+                sh 'chmod +x mvnw'
+                // Pass H2 settings directly to Maven to bypass file issues
+                sh """
+                ./mvnw clean test \
+                -Dspring.profiles.active=test \
+                -Dspring.datasource.url=jdbc:h2:mem:testdb \
+                -Dspring.datasource.driverClassName=org.h2.Driver \
+                -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+                """
             }
         }
 
